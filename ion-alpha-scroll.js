@@ -4,7 +4,7 @@ angular.module('ion-alpha-scroll', [])
     function ($ionicScrollDelegate, $location, $timeout, $document, $ionicPosition) {
       return {
         require: '?ngModel',
-        restrict: 'AE',
+        restrict: 'E',
         replace: true,
         compile: function (tElement, tAttrs, tTransclude) {
           var children = tElement.contents();
@@ -13,7 +13,7 @@ angular.module('ion-alpha-scroll', [])
             '<ion-scroll delegate-handle="alphaScroll">',
             '<div data-ng-repeat="(letter, items) in sorted_items" class="ion_alpha_list">',
             '<ion-item class="item item-divider" id="index_{{letter}}">{{letter}}</ion-item>',
-            '<ion-item ng-repeat="item in items"></ion-item>',
+            '<ion-item ng-class="{true: itemStyle}[true]" ng-repeat="item in items"></ion-item>',
             '</div>',
             '</ion-scroll>',
             '<ul class="ion_alpha_sidebar" on-drag="alphaSwipeGoToList($event)">',
@@ -48,6 +48,7 @@ angular.module('ion-alpha-scroll', [])
             // do nothing if the model is not set
             if (!ngModel) return;
 
+            scope.itemStyle = attrs.itemStyle;
             var sidebar = $document[0].body.querySelector('.ion_alpha_sidebar');
 
             ngModel.$render = function () {
