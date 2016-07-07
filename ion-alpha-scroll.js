@@ -72,16 +72,13 @@ angular.module('ion-alpha-scroll', [])
                 }
 
                 var sidebarHeight = $ionicPosition.position(angular.element(sidebar)).height;
-                if (y > sidebarHeight) {
+                var currentHeight = sidebarHeight - y;
+                if (currentHeight < 0) {
                   return;
                 }
 
                 var alphabetHeight = sidebarHeight / scope.alphabet.length;
-                var idx = scope.alphabet.length - parseInt((sidebarHeight - y) / alphabetHeight) - 1;
-                if (idx < 0) {
-                  return;
-                }
-
+                var idx = scope.alphabet.length - parseInt(currentHeight / alphabetHeight) - 1;
                 scope.alphaScrollGoToList('index_' + scope.alphabetStr.charAt(idx));
               };
 
