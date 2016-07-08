@@ -35,3 +35,11 @@
   align-items: center;
   font-size: 48px;
 }
+
+.ion_alpha_sidebar li {
+  color: #cccccc;
+}
+
+.alpha-active {
+  color: darkkhaki !important;
+}
