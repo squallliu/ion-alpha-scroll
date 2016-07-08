@@ -1,7 +1,7 @@
 angular.module('ion-alpha-scroll', [])
   .directive('ionAlphaScroll', [
-    '$ionicScrollDelegate', '$location', '$timeout', '$document', '$ionicPosition',
-    function ($ionicScrollDelegate, $location, $timeout, $document, $ionicPosition) {
+    '$ionicScrollDelegate', '$location', '$timeout', '$document', '$ionicPosition', '$filter',
+    function ($ionicScrollDelegate, $location, $timeout, $document, $ionicPosition, $filter) {
       return {
         require: '?ngModel',
         restrict: 'E',
@@ -10,14 +10,14 @@ angular.module('ion-alpha-scroll', [])
           var children = tElement.contents();
           var templateElements = [
             '<ion-list class="ion_alpha_list_outer">',
-            '<ion-scroll delegate-handle="alphaScroll">',
-            '<div data-ng-repeat="(letter, items) in sorted_items" class="ion_alpha_list">',
-            '<ion-item class="item item-divider" id="index_{{letter}}">{{letter}}</ion-item>',
-            '<ion-item ng-class="{true: itemStyle}[true]" ng-repeat="item in items"></ion-item>',
+            '<ion-scroll overflow-scroll="false" delegate-handle="alphaScroll">',
+            '<div collection-repeat="item in sorted_items" item-height="item.isDivider ? dividerHeight : itemHeight" class="ion_alpha_list">',
+            '<ion-item class="item item-divider" ng-if="item.isDivider">{{item.letter}}</ion-item>',
+            '<ion-item ng-class="{true: itemStyle}[true]" ng-if="!item.isDivider"></ion-item>',
             '</div>',
             '</ion-scroll>',
             '<ul class="ion_alpha_sidebar" on-drag="alphaSwipeGoToList($event)">',
-            '<li ng-click="alphaScrollGoToList(\'index_{{letter}}\')" ng-repeat="letter in alphabet | orderBy: letter">{{ letter }}</li>',
+            '<li ng-click="alphaScrollGoToList(\'{{letter}}\')" ng-repeat="letter in alphabet | orderBy: letter">{{ letter }}</li>',
             '</ul>',
             '</ion-list>'
           ];
@@ -49,22 +49,38 @@ angular.module('ion-alpha-scroll', [])
             if (!ngModel) return;
 
             scope.itemStyle = attrs.itemStyle;
+            scope.dividerHeight = attrs.dividerHeight ? attrs.dividerHeight : 37;
+            scope.itemHeight = attrs.itemHeight ? attrs.itemHeight : 73;
             var sidebar = $document[0].body.querySelector('.ion_alpha_sidebar');
 
             ngModel.$render = function () {
-              scope.items = [];
               scope.items = ngModel.$viewValue;
+              var sortedItems = $filter('orderBy')(scope.items, attrs.key);
               var tmp = {};
-              for (i = 0; i < scope.items.length; i++) {
-                var letter = scope.items[i][attrs.key].toUpperCase().charAt(0);
+              for (var i = 0; i < sortedItems.length; i++) {
+                var item = sortedItems[i];
+                var letter = item[attrs.key].toUpperCase().charAt(0);
                 if (tmp[letter] == undefined) {
-                  tmp[letter] = []
+                  tmp[letter] = {data: []};
                 }
-                tmp[letter].push(scope.items[i]);
+                tmp[letter].data.push(item);
               }
+
+              sortedItems = [];
+              var index = 0, dataSum = 0;
+              angular.forEach(tmp, function (items, idx) {
+                var top = 0;
+                if (index > 0) {
+                  dataSum += items.data.length;
+                  top = index * scope.dividerHeight + dataSum * scope.itemHeight;
+                }
+                items['top'] = top;
+                sortedItems = sortedItems.concat([{isDivider: true, letter: idx}].concat(items.data));
+                index++;
+              });
               scope.alphabet = iterateAlphabet(tmp);
               scope.alphabetStr = scope.alphabet.join('');
-              scope.sorted_items = tmp;
+              scope.sorted_items = sortedItems;
 
               scope.alphaSwipeGoToList = function ($event) {
                 var y = $event.gesture.center.pageY - topHeight;
@@ -80,12 +96,16 @@ angular.module('ion-alpha-scroll', [])
 
                 var alphabetHeight = sidebarHeight / scope.alphabet.length;
                 var idx = scope.alphabet.length - parseInt(currentHeight / alphabetHeight) - 1;
-                scope.alphaScrollGoToList('index_' + scope.alphabetStr.charAt(idx));
+                scope.alphaScrollGoToList(scope.alphabetStr.charAt(idx));
               };
 
               scope.alphaScrollGoToList = function (id) {
-                $location.hash(id);
-                $ionicScrollDelegate.$getByHandle('alphaScroll').anchorScroll(true);
+                if (id == scope.previousId) {
+                  return;
+                }
+
+                scope.previousId = id;
+                $ionicScrollDelegate.$getByHandle('alphaScroll').scrollTo(0, tmp[id].top, true);
               };
 
               //Create alphabet object
