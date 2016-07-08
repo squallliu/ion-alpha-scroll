@@ -17,7 +17,7 @@ angular.module('ion-alpha-scroll', ['ionic'])
             '</div>',
             '</ion-scroll>',
             '<ul class="ion_alpha_sidebar" on-drag-start="alphaSwipeStart()" on-drag="alphaSwipeGoToList($event)" on-drag-end="alphaSwipeEnd()">',
-            '<li ng-click="alphaScrollGoToList(\'{{letter}}\')" ng-repeat="letter in alphabet | orderBy: letter">{{ letter }}</li>',
+            '<li ng-class="{\'alpha-active\': alpha.isActive}" ng-click="alphaScrollGoToList(\'{{alpha.letter}}\')" ng-repeat="alpha in alphabet">{{alpha.letter}}</li>',
             '</ul>',
             '</ion-list>'
           ];
@@ -141,26 +141,20 @@ angular.module('ion-alpha-scroll', ['ionic'])
                 return;
               }
 
-              var alphabetHeight = sidebarHeight / scope.alphabet.length;
-              var idx = scope.alphabet.length - parseInt(currentHeight / alphabetHeight) - 1;
+              var alphabetHeight = sidebarHeight / scope.alphabetStr.length;
+              var idx = scope.alphabetStr.length - parseInt(currentHeight / alphabetHeight) - 1;
               scope.alphaScrollGoToList(scope.alphabetStr.charAt(idx));
             };
 
             //Create alphabet object
             function iterateAlphabet(alphabet) {
-              var str = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-              var keys = Object.keys(alphabet);
-              if (keys.length != 0) {
-                str = '';
-                for (var i = 0; i < keys.length; i++) {
-                  str += keys[i];
-                }
+              var result = [];
+              for (var i = 0; i < scope.alphabetStr.length; i++) {
+                var letter = scope.alphabetStr.charAt(i);
+                var isActive = alphabet[letter] ? true : false;
+                result.push({letter: letter, isActive: isActive});
               }
-              var numbers = new Array();
-              for (var i = 0; i < str.length; i++) {
-                numbers.push(str.charAt(i));
-              }
-              return numbers;
+              return result;
             }
 
             scope.alphaScrollGoToList = function (id) {
@@ -171,10 +165,16 @@ angular.module('ion-alpha-scroll', ['ionic'])
               if (isAlphaSwipping) {
                 indicatorShow(id);
               }
-
+              
               scope.previousId = id;
+              if (!scope.groups[id]) {
+                return;
+              }
+              
               $ionicScrollDelegate.$getByHandle('alphaScroll').scrollTo(0, scope.groups[id].top, true);
             };
+
+            scope.alphabetStr = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
             ngModel.$render = function () {
               scope.items = ngModel.$viewValue;
@@ -182,7 +182,6 @@ angular.module('ion-alpha-scroll', ['ionic'])
 
               scope.groups = groupItems(sortedItems, attrs.key);
               scope.alphabet = iterateAlphabet(scope.groups);
-              scope.alphabetStr = scope.alphabet.join('');
               scope.sorted_items = unwindGroup(scope.groups);
             };
           }
