@@ -16,7 +16,7 @@ angular.module('ion-alpha-scroll', [])
             '<ion-item ng-class="{true: itemStyle}[true]" ng-if="!item.isDivider"></ion-item>',
             '</div>',
             '</ion-scroll>',
-            '<ul class="ion_alpha_sidebar" on-drag="alphaSwipeGoToList($event)">',
+            '<ul class="ion_alpha_sidebar" on-drag-start="alphaSwipeStart()" on-drag="alphaSwipeGoToList($event)" on-drag-end="alphaSwipeEnd()">',
             '<li ng-click="alphaScrollGoToList(\'{{letter}}\')" ng-repeat="letter in alphabet | orderBy: letter">{{ letter }}</li>',
             '</ul>',
             '</ion-list>'
@@ -44,6 +44,39 @@ angular.module('ion-alpha-scroll', [])
             "height": contentHeight + 'px'
           });
 
+          var letterIndicator = angular.element('<div class="letter-indicator">A</div>');
+          $document[0].body.appendChild(letterIndicator[0]);
+
+          var indicatorIsShow = false;
+          function indicatorShow(letter) {
+            letterIndicator.text(letter);
+
+            if (indicatorIsShow) {
+              return;
+            }
+
+            indicatorIsShow = true;
+
+            letterIndicator.css({
+              "display": "flex"
+            });
+            $timeout(function () {
+              var indicatorPosition = $ionicPosition.position(letterIndicator);
+              letterIndicator.css({
+                "z-index": 10,
+                "top": (windowHeight - indicatorPosition.height) / 2 + 'px',
+                "left": (window.innerWidth - indicatorPosition.width) / 2 + 'px'
+              });
+            }, 200);
+          }
+
+          function indicatorHide() {
+            letterIndicator.css({
+              "display": "none"
+            });
+            indicatorIsShow = false;
+          }
+
           return function (scope, element, attrs, ngModel) {
             // do nothing if the model is not set
             if (!ngModel) return;
@@ -52,6 +85,10 @@ angular.module('ion-alpha-scroll', [])
             scope.dividerHeight = attrs.dividerHeight ? attrs.dividerHeight : 37;
             scope.itemHeight = attrs.itemHeight ? attrs.itemHeight : 73;
             var sidebar = $document[0].body.querySelector('.ion_alpha_sidebar');
+
+            scope.$on('$destroy', function () {
+              letterIndicator.remove();
+            });
 
             ngModel.$render = function () {
               scope.items = ngModel.$viewValue;
@@ -82,6 +119,17 @@ angular.module('ion-alpha-scroll', [])
               scope.alphabetStr = scope.alphabet.join('');
               scope.sorted_items = sortedItems;
 
+              var isAlphaSwipe = false;
+
+              scope.alphaSwipeStart = function () {
+                isAlphaSwipe = true;
+              };
+
+              scope.alphaSwipeEnd = function () {
+                isAlphaSwipe = false;
+                indicatorHide();
+              };
+
               scope.alphaSwipeGoToList = function ($event) {
                 var y = $event.gesture.center.pageY - topHeight;
                 if (y < 0) {
@@ -102,6 +150,10 @@ angular.module('ion-alpha-scroll', [])
               scope.alphaScrollGoToList = function (id) {
                 if (id == scope.previousId) {
                   return;
+                }
+
+                if (isAlphaSwipe) {
+                  indicatorShow(id);
                 }
 
                 scope.previousId = id;
