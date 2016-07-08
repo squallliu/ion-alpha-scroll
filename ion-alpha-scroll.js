@@ -68,14 +68,14 @@ angular.module('ion-alpha-scroll', [])
 
               sortedItems = [];
               var index = 0, dataSum = 0;
-              angular.forEach(tmp, function (items, idx) {
+              angular.forEach(tmp, function (group, letter) {
                 var top = 0;
                 if (index > 0) {
-                  dataSum += items.data.length;
+                  dataSum += group.data.length;
                   top = index * scope.dividerHeight + dataSum * scope.itemHeight;
                 }
-                items['top'] = top;
-                sortedItems = sortedItems.concat([{isDivider: true, letter: idx}].concat(items.data));
+                group['top'] = top;
+                sortedItems = sortedItems.concat([{isDivider: true, letter: letter}].concat(group.data));
                 index++;
               });
               scope.alphabet = iterateAlphabet(tmp);
@@ -111,16 +111,16 @@ angular.module('ion-alpha-scroll', [])
               //Create alphabet object
               function iterateAlphabet(alphabet) {
                 var str = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-                if (Object.keys(alphabet).length != 0) {
+                var keys = Object.keys(alphabet);
+                if (keys.length != 0) {
                   str = '';
-                  for (var i = 0; i < Object.keys(alphabet).length; i++) {
-                    str += Object.keys(alphabet)[i];
+                  for (var i = 0; i < keys.length; i++) {
+                    str += keys[i];
                   }
                 }
                 var numbers = new Array();
                 for (var i = 0; i < str.length; i++) {
-                  var nextChar = str.charAt(i);
-                  numbers.push(nextChar);
+                  numbers.push(str.charAt(i));
                 }
                 return numbers;
               }
