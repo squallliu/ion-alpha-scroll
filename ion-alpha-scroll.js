@@ -33,7 +33,7 @@ angular.module('ion-alpha-scroll', ['ionic'])
           var tabHeight = $document[0].body.querySelector('.tab-nav') ? $document[0].body.querySelector('.tab-nav').offsetHeight : 0;
           var windowHeight = window.innerHeight;
 
-          var topHeight = headerHeight + subHeaderHeight + tabHeight;
+          var topHeight = tAttrs.topHeight ? tAttrs.topHeight: headerHeight + subHeaderHeight + tabHeight;
           var contentHeight = windowHeight - topHeight;
 
           angular.element(template.find('ion-item')[1]).append(children);
