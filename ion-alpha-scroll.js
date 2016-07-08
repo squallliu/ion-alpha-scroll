@@ -1,4 +1,4 @@
-angular.module('ion-alpha-scroll', [])
+angular.module('ion-alpha-scroll', ['ionic'])
   .directive('ionAlphaScroll', [
     '$ionicScrollDelegate', '$location', '$timeout', '$document', '$ionicPosition', '$filter',
     function ($ionicScrollDelegate, $location, $timeout, $document, $ionicPosition, $filter) {
@@ -56,7 +56,6 @@ angular.module('ion-alpha-scroll', [])
             }
 
             indicatorIsShow = true;
-
             letterIndicator.css({
               "display": "flex"
             });
@@ -79,103 +78,112 @@ angular.module('ion-alpha-scroll', [])
 
           return function (scope, element, attrs, ngModel) {
             // do nothing if the model is not set
-            if (!ngModel) return;
+            if (!ngModel) {
+              return;
+            }
 
             scope.itemStyle = attrs.itemStyle;
             scope.dividerHeight = attrs.dividerHeight ? attrs.dividerHeight : 37;
             scope.itemHeight = attrs.itemHeight ? attrs.itemHeight : 73;
-            var sidebar = $document[0].body.querySelector('.ion_alpha_sidebar');
+            var $sidebar = angular.element($document[0].body.querySelector('.ion_alpha_sidebar'));
 
-            scope.$on('$destroy', function () {
-              letterIndicator.remove();
-            });
-
-            ngModel.$render = function () {
-              scope.items = ngModel.$viewValue;
-              var sortedItems = $filter('orderBy')(scope.items, attrs.key);
-              var tmp = {};
-              for (var i = 0; i < sortedItems.length; i++) {
-                var item = sortedItems[i];
-                var letter = item[attrs.key].toUpperCase().charAt(0);
-                if (tmp[letter] == undefined) {
-                  tmp[letter] = {data: []};
+            function groupItems(items, groupBy) {
+              var result = {};
+              for (var i = 0; i < items.length; i++) {
+                var item = items[i];
+                var letter = item[groupBy].toUpperCase().charAt(0);
+                if (result[letter] == undefined) {
+                  result[letter] = {data: []};
                 }
-                tmp[letter].data.push(item);
+                result[letter].data.push(item);
               }
+              return result;
+            }
 
-              sortedItems = [];
+            function unwindGroup(groups) {
+              var result = [];
               var index = 0, dataSum = 0;
-              angular.forEach(tmp, function (group, letter) {
+              angular.forEach(groups, function (group, letter) {
                 var top = 0;
                 if (index > 0) {
                   dataSum += group.data.length;
                   top = index * scope.dividerHeight + dataSum * scope.itemHeight;
                 }
                 group['top'] = top;
-                sortedItems = sortedItems.concat([{isDivider: true, letter: letter}].concat(group.data));
+                result = result.concat([{isDivider: true, letter: letter}].concat(group.data));
                 index++;
               });
-              scope.alphabet = iterateAlphabet(tmp);
-              scope.alphabetStr = scope.alphabet.join('');
-              scope.sorted_items = sortedItems;
+              return result;
+            }
 
-              var isAlphaSwipe = false;
+            scope.$on('$destroy', function () {
+              letterIndicator.remove();
+            });
 
-              scope.alphaSwipeStart = function () {
-                isAlphaSwipe = true;
-              };
+            var isAlphaSwipping = false;
+            scope.alphaSwipeStart = function () {
+              isAlphaSwipping = true;
+            };
+            scope.alphaSwipeEnd = function () {
+              isAlphaSwipping = false;
+              indicatorHide();
+            };
 
-              scope.alphaSwipeEnd = function () {
-                isAlphaSwipe = false;
-                indicatorHide();
-              };
-
-              scope.alphaSwipeGoToList = function ($event) {
-                var y = $event.gesture.center.pageY - topHeight;
-                if (y < 0) {
-                  return;
-                }
-
-                var sidebarHeight = $ionicPosition.position(angular.element(sidebar)).height;
-                var currentHeight = sidebarHeight - y;
-                if (currentHeight < 0) {
-                  return;
-                }
-
-                var alphabetHeight = sidebarHeight / scope.alphabet.length;
-                var idx = scope.alphabet.length - parseInt(currentHeight / alphabetHeight) - 1;
-                scope.alphaScrollGoToList(scope.alphabetStr.charAt(idx));
-              };
-
-              scope.alphaScrollGoToList = function (id) {
-                if (id == scope.previousId) {
-                  return;
-                }
-
-                if (isAlphaSwipe) {
-                  indicatorShow(id);
-                }
-
-                scope.previousId = id;
-                $ionicScrollDelegate.$getByHandle('alphaScroll').scrollTo(0, tmp[id].top, true);
-              };
-
-              //Create alphabet object
-              function iterateAlphabet(alphabet) {
-                var str = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-                var keys = Object.keys(alphabet);
-                if (keys.length != 0) {
-                  str = '';
-                  for (var i = 0; i < keys.length; i++) {
-                    str += keys[i];
-                  }
-                }
-                var numbers = new Array();
-                for (var i = 0; i < str.length; i++) {
-                  numbers.push(str.charAt(i));
-                }
-                return numbers;
+            scope.alphaSwipeGoToList = function ($event) {
+              var y = $event.gesture.center.pageY - topHeight;
+              if (y < 0) {
+                return;
               }
+
+              var sidebarHeight = $ionicPosition.position($sidebar).height;
+              var currentHeight = sidebarHeight - y;
+              if (currentHeight < 0) {
+                return;
+              }
+
+              var alphabetHeight = sidebarHeight / scope.alphabet.length;
+              var idx = scope.alphabet.length - parseInt(currentHeight / alphabetHeight) - 1;
+              scope.alphaScrollGoToList(scope.alphabetStr.charAt(idx));
+            };
+
+            //Create alphabet object
+            function iterateAlphabet(alphabet) {
+              var str = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+              var keys = Object.keys(alphabet);
+              if (keys.length != 0) {
+                str = '';
+                for (var i = 0; i < keys.length; i++) {
+                  str += keys[i];
+                }
+              }
+              var numbers = new Array();
+              for (var i = 0; i < str.length; i++) {
+                numbers.push(str.charAt(i));
+              }
+              return numbers;
+            }
+
+            scope.alphaScrollGoToList = function (id) {
+              if (id == scope.previousId) {
+                return;
+              }
+
+              if (isAlphaSwipping) {
+                indicatorShow(id);
+              }
+
+              scope.previousId = id;
+              $ionicScrollDelegate.$getByHandle('alphaScroll').scrollTo(0, scope.groups[id].top, true);
+            };
+
+            ngModel.$render = function () {
+              scope.items = ngModel.$viewValue;
+              var sortedItems = $filter('orderBy')(scope.items, attrs.key);
+
+              scope.groups = groupItems(sortedItems, attrs.key);
+              scope.alphabet = iterateAlphabet(scope.groups);
+              scope.alphabetStr = scope.alphabet.join('');
+              scope.sorted_items = unwindGroup(scope.groups);
             };
           }
         }
