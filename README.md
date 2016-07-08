@@ -3,6 +3,16 @@ ion-alpha-scroll
 
 > Configurable Ionic directive for alphabetically indexed list with an alpha scroll bar.
 
+#新特性（基于原版重写）
+
+- fixed [https://github.com/aquint/ion-alpha-scroll/issues/8]
+- merged [https://github.com/aquint/ion-alpha-scroll/pull/9]
+- 支持 item 样式指定(itemStyle 属性)
+- 默认用 collection-repeat 替代 ng-repeat
+- 支持自定义 dividerHeight 和 itemHeight
+- 支持滑动索引条定位
+- 添加定位时滚动的动画效果
+
 #Table of contents
 
 - [Demo](#demo)
@@ -67,27 +77,27 @@ angular.module('example.services', [])
   {
     id: 0,
     name: 'Ben Sparrow',
-    address: '123 Fake St.'
+    address: '123 Fake St.',
     face: 'https://pbs.twimg.com/profile_images/514549811765211136/9SgAuHeY.png'
   }, {
     id: 1,
     name: 'Max Lynx',
-    address: '123 Fake St.'
+    address: '123 Fake St.',
     face: 'https://avatars3.githubusercontent.com/u/11214?v=3&s=460'
   },{
     id: 2,
     name: 'Adam Bradleyson',
-    address: '123 Fake St.'
+    address: '123 Fake St.',
     face: 'https://pbs.twimg.com/profile_images/479090794058379264/84TKj_qa.jpeg'
   }, {
     id: 3,
     name: 'Perry Governor',
-    address: '123 Fake St.'
+    address: '123 Fake St.',
     face: 'https://pbs.twimg.com/profile_images/491995398135767040/ie2Z_V6e.jpeg'
   }, {
     id: 4,
     name: 'Mike Harrington',
-    address: '123 Fake St.'
+    address: '123 Fake St.',
     face: 'https://pbs.twimg.com/profile_images/578237281384841216/R3ae1n61.png'
   }
 
