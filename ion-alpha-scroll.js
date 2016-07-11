@@ -31,10 +31,9 @@ angular.module('ion-alpha-scroll', ['ionic'])
           var headerHeight = $document[0].body.querySelector('.bar-header').offsetHeight;
           var subHeaderHeight = tAttrs.subheader === "true" ? 44 : 0;
           var tabHeight = $document[0].body.querySelector('.tab-nav') ? $document[0].body.querySelector('.tab-nav').offsetHeight : 0;
-          var windowHeight = window.innerHeight;
 
           var topHeight = tAttrs.topHeight ? tAttrs.topHeight: headerHeight + subHeaderHeight + tabHeight;
-          var contentHeight = windowHeight - topHeight;
+          var contentHeight = window.innerHeight - topHeight;
 
           angular.element(template.find('ion-item')[1]).append(children);
           tElement.html('');
@@ -63,7 +62,7 @@ angular.module('ion-alpha-scroll', ['ionic'])
               var indicatorPosition = $ionicPosition.position(letterIndicator);
               letterIndicator.css({
                 "z-index": 10,
-                "top": (windowHeight - indicatorPosition.height) / 2 + 'px',
+                "top": (window.innerHeight - indicatorPosition.height) / 2 + 'px',
                 "left": (window.innerWidth - indicatorPosition.width) / 2 + 'px'
               });
             }, 50, false);
