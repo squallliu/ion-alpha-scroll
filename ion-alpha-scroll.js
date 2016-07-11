@@ -66,7 +66,7 @@ angular.module('ion-alpha-scroll', ['ionic'])
                 "top": (windowHeight - indicatorPosition.height) / 2 + 'px',
                 "left": (window.innerWidth - indicatorPosition.width) / 2 + 'px'
               });
-            }, 200);
+            }, 50, false);
           }
 
           function indicatorHide() {
