@@ -11,6 +11,7 @@ ion-alpha-scroll
 - 默认用 collection-repeat 替代 ng-repeat
 - 支持自定义 dividerHeight 和 itemHeight
 - 支持滑动索引条定位
+- 自动检测subheader与footerbar
 - 添加定位时滚动的动画效果
 
 #Table of contents
@@ -48,13 +49,11 @@ angular.module('myApp', [
 
 To use the `ion-alpha-scroll` directive simply add the following snippet to your template:
 ```html
-<ion-alpha-scroll ng-model="model" key="keyName" subheader="true">
+<ion-alpha-scroll ng-model="model" key="keyName">
   Content Goes here...
 </ion-alpha-scroll>
 ```
 where 'ng-model' is the model you would like to sort and 'key' is the name of the key you would like to sort by.
-
-The 'subheader' attribute is optional, to be set if using a subheader in the view to allow proper scroll height.
 
 To display the properties of each item in the model, you can use the 'item' object within the directive:
 ```html
