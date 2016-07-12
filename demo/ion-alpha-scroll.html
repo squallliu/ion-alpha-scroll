@@ -3,9 +3,9 @@
     <h2 class="title">Sub Header</h2>
   </div>
   <ion-content class="has-subheader" has-bouncing="false">
-    <ion-alpha-scroll ng-model="contacts" key="name" subheader="true" refresher='{"text": "下拉刷新", "callback": "doRefresh()"}'>
-      <div>{{item.name}}</div>
-      <div>{{item.description}}</div>
+    <ion-alpha-scroll ng-model="contacts" key="name" refresher='{"text": "下拉刷新", "callback": "doRefresh()"}'>
+      <h2>{{item.name}}</h2>
+      <p>{{item.description}}</p>
     </ion-alpha-scroll>
   </ion-content>
 </ion-view>

@@ -27,21 +27,9 @@ angular.module('ion-alpha-scroll', ['ionic'])
             templateElements.splice(2, 0, refresherElement);
           }
           var template = angular.element(templateElements.join(''));
-
-          var headerHeight = $document[0].body.querySelector('.bar-header').offsetHeight;
-          var subHeaderHeight = tAttrs.subheader === "true" ? 44 : 0;
-          var tabHeight = $document[0].body.querySelector('.tab-nav') ? $document[0].body.querySelector('.tab-nav').offsetHeight : 0;
-
-          var topHeight = tAttrs.topHeight ? tAttrs.topHeight: headerHeight + subHeaderHeight + tabHeight;
-          var contentHeight = window.innerHeight - topHeight;
-
           angular.element(template.find('ion-item')[1]).append(children);
           tElement.html('');
           tElement.append(template);
-
-          tElement.find('ion-scroll').css({
-            "height": contentHeight + 'px'
-          });
 
           var letterIndicator = angular.element('<div class="letter-indicator">A</div>');
           $document[0].body.appendChild(letterIndicator[0]);
@@ -174,6 +162,19 @@ angular.module('ion-alpha-scroll', ['ionic'])
             };
 
             scope.alphabetStr = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
+            var headerHeight = $document[0].body.querySelector('.bar-header').offsetHeight;
+            var footerHeight = $document[0].body.querySelector('.bar-footer') ? $document[0].body.querySelector('.bar-footer').offsetHeight : 0;
+            var subHeaderHeight = $document[0].body.querySelector('.bar-subheader') ? $document[0].body.querySelector('.bar-subheader').offsetHeight : 0;
+            var tabHeight = $document[0].body.querySelector('.tab-nav') ? $document[0].body.querySelector('.tab-nav').offsetHeight : 0;
+            var topHeight = attrs.topHeight ? attrs.topHeight: headerHeight + subHeaderHeight + tabHeight;
+            var contentHeight = window.innerHeight - topHeight - footerHeight;
+            element.find('ion-scroll').css({
+              "height": contentHeight + 'px'
+            });
+            angular.element(element[0].querySelector('.ion_alpha_sidebar')).css({
+              "height": contentHeight + 'px'
+            });
 
             ngModel.$render = function () {
               scope.items = ngModel.$viewValue;
