@@ -164,12 +164,11 @@ angular.module('ion-alpha-scroll', ['ionic'])
             scope.alphabetStr = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
             var $body = $document[0].body;
-            var statusbarHeight = $body.querySelector('.status-bar') ? $body.querySelector('.status-bar').offsetHeight : 0;
             var headerHeight = $body.querySelector('.bar-header').offsetHeight;
             var footerHeight = $body.querySelector('.bar-footer') ? $body.querySelector('.bar-footer').offsetHeight : 0;
             var subHeaderHeight = $body.querySelector('.bar-subheader') ? $body.querySelector('.bar-subheader').offsetHeight : 0;
             var tabHeight = $body.querySelector('.tab-nav') ? $body.querySelector('.tab-nav').offsetHeight : 0;
-            var topHeight = attrs.topHeight ? attrs.topHeight: headerHeight + subHeaderHeight + tabHeight + statusbarHeight;
+            var topHeight = attrs.topHeight ? attrs.topHeight: headerHeight + subHeaderHeight + tabHeight;
             var contentHeight = window.innerHeight - topHeight - footerHeight;
             element.find('ion-scroll').css({
               "height": contentHeight + 'px'
