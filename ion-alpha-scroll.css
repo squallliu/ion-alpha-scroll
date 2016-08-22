@@ -1,5 +1,5 @@
 .ion_alpha_list_outer .list {
-  padding-right: 15px;
+  padding-right: 20px;
 }
 
 .ion_alpha_list_outer .item {
@@ -10,6 +10,7 @@
   position: fixed;
   right: 0;
   top: 0;
+  width: 20px;
   display: flex;
   flex-direction: column;
   justify-content: space-around;
@@ -17,7 +18,9 @@
 
 .ion_alpha_sidebar li {
   line-height: 1.1;
+  text-align: center;
   cursor: pointer;
+  width: 100%;
 }
 
 .letter-indicator {
